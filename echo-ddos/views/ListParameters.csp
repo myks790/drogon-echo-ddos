@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<%c++
+    auto para=@@.get<std::unordered_map<std::string,std::string>>("parameters");
+%>
+<head>
+    <meta charset="UTF-8">
+    <title>status</title>
+</head>
+<body>
+    <H1>Info</H1>
+    <div>cpu : <span id="cpu">[[cpu_info]]</span></div>
+    <div>mem : <span id="mem">[[mem_info]]</span></div>
+    <H1>RPS</H1>
+    <div>1s : <span id ="s1"></span></div>
+    <div>1m : <span id ="m1"></span></div>
+    <div>10m : <span id ="m10"></span></div>
+
+    <canvas id="line-chart" width="300" height="250"></canvas>
+    <%c++ if(para.size()>0){%>
+    <H1>Parameters</H1>
+    <table border="1">
+      <tr>
+        <th>name</th>
+        <th>value</th>
+      </tr>
+      <%c++ for(auto iter:para){%>
+      <tr>
+        <td>{%iter.first%}</td>
+        <td><%c++ $$<<iter.second;%></td>
+      </tr>
+      <%c++}%>
+    </table>
+    <%c++ }else{%>
+    <H1>no parameter</H1>
+    <%c++}%>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+
+    <script>
+      var data = {
+          labels: new Array(60),
+          datasets: [{ 
+              data: new Array(60),
+              label: "cpu",
+              borderColor: "#3e95cd",
+              fill: false
+            }, { 
+              data: new Array(60),
+              label: "mem",
+              borderColor: "#8e5ea2",
+              fill: false
+            }, { 
+              data: new Array(60),
+              label: "1s",
+              borderColor: "#3cba9f",
+              fill: false
+            }, { 
+              data: new Array(60),
+              label: "1m",
+              borderColor: "#e8c3b9",
+              fill: false
+            }, { 
+              data: new Array(60),
+              label: "10m",
+              borderColor: "#c45850",
+              fill: false
+                }
+              ]
+            }
+      var updateData = function(oldData){
+        var labels = oldData["labels"];
+        labels.shift();
+        var today = new Date();   
+        var minutes = ('0' + today.getMinutes()).slice(-2);
+        var seconds = ('0' + today.getSeconds()).slice(-2); 
+        var timeString = minutes  + ':' + seconds;
+        labels.push(timeString);
+
+        fetch('/cpu').then((res)=>res.text()).then((data)=>{
+          document.getElementById('cpu').textContent=data+"%";
+          var dataSetCPU = oldData["datasets"][0]["data"];
+          dataSetCPU.push(data);
+          dataSetCPU.shift();
+        })
+        fetch('/mem').then((res)=>res.text()).then((data)=>{
+          document.getElementById('mem').textContent=data+"%";
+          var dataSetMEM = oldData["datasets"][1]["data"];
+          dataSetMEM.push(data);
+          dataSetMEM.shift();
+        })
+        fetch('/rps?q=1s').then((res)=>res.text()).then((data)=>{
+          document.getElementById('s1').textContent=data;
+          var dataSet1s = oldData["datasets"][2]["data"];
+          dataSet1s.push(data);
+          dataSet1s.shift();
+        })
+        fetch('/rps?q=1m').then((res)=>res.text()).then((data)=>{
+          document.getElementById('m1').textContent=data
+          const dataSet1m = oldData["datasets"][3]["data"];
+          dataSet1m.push(data);
+          dataSet1m.shift();
+        })
+        fetch('/rps?q=10m').then((res)=>res.text()).then((data)=>{
+          document.getElementById('m10').textContent=data
+          const dataSet10m = oldData["datasets"][4]["data"];
+          dataSet10m.push(data);
+          dataSet10m.shift();
+        })
+      };
+      const chart = new Chart(document.getElementById("line-chart"), {
+        type: 'line',
+        data: data,
+            options: {
+              title: {
+                display: true,
+                text: 'World population per region (in millions)'
+              }
+            }
+          });
+      setInterval(function(){
+        updateData(data);
+        chart.update();
+        ;}, 1000
+      );
+      
+    </script>
+</body>
+</html>

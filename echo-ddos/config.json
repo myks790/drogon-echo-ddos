@@ -70,7 +70,7 @@
             // the wiki for more details.
             "auto_batch": false
         }
-    ],
+    ],*/
     "redis_clients": [
         {
             //name: Name of the client,'default' by default
@@ -87,7 +87,7 @@
             "db": 0,
             //is_fast: false by default, if it is true, the client is faster but user can't call
             //any synchronous interface of it.
-            "is_fast": false,
+            "is_fast": true,
             //number_of_connections: 1 by default, if the 'is_fast' is true, the number is the number of  
             //connections per IO thread, otherwise it is the total number of all connections.  
             "number_of_connections": 1,
@@ -95,7 +95,7 @@
             //zero or negative value means no timeout.
             "timeout": -1.0
         }
-    ],*/
+    ],
     "app": {
         //number_of_threads: The number of IO threads, 1 by default, if the value is set to 0, the number of threads
         //is the number of CPU cores
@@ -105,7 +105,7 @@
         "session_timeout": 0,
         //string value of SameSite attribute of the Set-Cookie HTTP respone header
         //valid value is either 'Null' (default), 'Lax', 'Strict' or 'None'
-        "session_same_site" : "Null",
+        "session_same_site": "Null",
         //document_root: Root path of HTTP document, defaut path is ./
         "document_root": "./",
         //home_page: Set the HTML file of the home page, the default value is "index.html"
