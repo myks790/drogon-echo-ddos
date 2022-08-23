@@ -64,9 +64,9 @@ void StatusCtrl::asyncHandleHttpRequest(const HttpRequestPtr &req, std::function
             q_time = std::chrono::minutes(1);
         else if (q == "10m")
             q_time = std::chrono::minutes(10);
-
-        std::int64_t starttime = std::chrono::duration_cast<std::chrono::milliseconds>((std::chrono::system_clock::now() - base_time - q_time).time_since_epoch()).count();
-        std::int64_t endtime = std::chrono::duration_cast<std::chrono::milliseconds>((std::chrono::system_clock::now() - base_time).time_since_epoch()).count();
+        auto now = std::chrono::system_clock::now();
+        std::int64_t starttime = std::chrono::duration_cast<std::chrono::milliseconds>((now - base_time - q_time).time_since_epoch()).count();
+        std::int64_t endtime = std::chrono::duration_cast<std::chrono::milliseconds>((now - base_time).time_since_epoch()).count();
 
         nosql::RedisClientPtr redis_ptr = drogon::app().getFastRedisClient();
         redis_ptr->execCommandAsync([callback](const nosql::RedisResult &r)

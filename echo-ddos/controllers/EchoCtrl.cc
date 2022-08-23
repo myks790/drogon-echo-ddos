@@ -10,12 +10,12 @@ void EchoCtrl::asyncHandleHttpRequest(const HttpRequestPtr &req, std::function<v
                                 {
                                     auto resp = HttpResponse::newHttpResponse();
                                     resp->setStatusCode(k200OK);
-                                    resp->setContentTypeCode(CT_TEXT_HTML);
+                                    resp->setContentTypeCode(CT_APPLICATION_JSON);
                                     resp->setBody("{\"message\":\"" + message + "\"}");
                                     callback(resp); },
                                 [](const std::exception &err)
                                 {
                                     LOG_ERROR << err.what();
                                 },
-                                "ZADD echo2 %lld %lld", timestamp, timestamp);
+                                "ZADD echo2 %lld %s", timestamp, drogon::utils::getUuid());
 }
